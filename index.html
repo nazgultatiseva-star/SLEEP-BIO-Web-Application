@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="kk" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLEEP BIO – Ұйқының адам ағзасына әсерін зерттеу</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        night: {
+                            900: '#0B0F19',
+                            800: '#111827',
+                            700: '#1F2937',
+                            600: '#374151'
+                        },
+                        bio: {
+                            cyan: '#06B6D4',
+                            purple: '#8B5CF6',
+                            pink: '#EC4899',
+                            emerald: '#10B981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0F19;
+            color: #F3F4F6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4B5563;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glow-purple {
+            box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.3);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-bio-purple selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-bio-purple to-bio-cyan flex items-center justify-center text-white shadow-lg glow-purple">
+                    <i class="fa-solid font-bold fa-moon text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-bio-cyan via-bio-purple to-bio-pink">SLEEP BIO</span>
+                    <span class="text-xs block text-gray-400 font-medium">Ғылыми Зерттеу Платформасы</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-1">
+                <a href="#overview" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition">Шолу</a>
+                <a href="#log-section" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition">Күнделік</a>
+                <a href="#test-section" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition">Зейін Тесті</a>
+                <a href="#analytics-section" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition">Аналитика</a>
+                <a href="#bio-section" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition">Биологиялық түсіндірме</a>
+            </nav>
+
+            <button onclick="scrollToTest()" class="bg-gradient-to-r from-bio-purple to-bio-cyan text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition shadow-md flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Тест тапсыру</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 flex-grow">
+
+        <!-- Banner / Hero Section -->
+        <section id="overview" class="relative rounded-2xl overflow-hidden glass-panel p-6 sm:p-10 border border-gray-800">
+            <div class="absolute -right-20 -top-20 w-80 h-80 bg-bio-purple/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-bio-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-3xl space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bio-purple/10 border border-bio-purple/30 text-bio-purple text-xs font-semibold">
+                    <i class="fa-solid fa-microscope"></i> Зерттеу жобасы
+                </div>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                    Ұйқының адам ағзасы мен <span class="bg-clip-text text-transparent bg-gradient-to-r from-bio-cyan to-bio-purple">зейін көрсеткішіне</span> әсері
+                </h1>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed">
+                    <strong>Зерттеу сұрағы:</strong> Ұйқы ұзақтығы мен зейін көрсеткіштері арасында тікелей байланыс бар ма? Бұл платформа арқылы күнделікті ұйқыңызды тіркеп, зейін тестін өтіп, биологиялық өзгерістерді бақылай аласыз.
+                </p>
+            </div>
+        </section>
+
+        <!-- KPI Cards Summary -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card p-5 rounded-xl border border-gray-800 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-medium">Орташа ұйқы ұзақтығы</p>
+                    <h3 id="kpi-avg-sleep" class="text-2xl font-bold text-white mt-1">-- сағ</h3>
+                    <p class="text-xs text-bio-cyan mt-1"><i class="fa-solid fa-circle-info"></i> Мақсат: 7-9 сағат</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-bio-cyan/10 text-bio-cyan flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-bed"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-xl border border-gray-800 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-medium">Орташа зейін балы</p>
+                    <h3 id="kpi-avg-attention" class="text-2xl font-bold text-white mt-1">--%</h3>
+                    <p id="kpi-attention-status" class="text-xs text-bio-emerald mt-1"><i class="fa-solid fa-chart-line"></i> Жоғары реакция</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-bio-purple/10 text-bio-purple flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-xl border border-gray-800 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-medium">Ұйқы сапасы (Индекс)</p>
+                    <h3 id="kpi-avg-quality" class="text-2xl font-bold text-white mt-1">-- / 10</h3>
+                    <p class="text-xs text-gray-400 mt-1">Тіркелген күндер: <span id="kpi-days-count" class="text-white font-bold">0</span></p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-bio-pink/10 text-bio-pink flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-xl border border-gray-800 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-medium">Когнитивті статус</p>
+                    <h3 id="kpi-status-text" class="text-lg font-bold text-bio-emerald mt-1">Оптималды</h3>
+                    <p class="text-xs text-gray-400 mt-1">Глимфатикалық белсенділік</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-bio-emerald/10 text-bio-emerald flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-dna"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Attention Test Game -->
+        <section id="test-section" class="glass-panel p-6 sm:p-8 rounded-2xl border border-gray-800 relative overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-stopwatch text-bio-purple"></i> Интерактивті Зейін Тесті (Реакция)
+                    </h2>
+                    <p class="text-sm text-gray-400 mt-1">Түйме жасыл түске айналған бойда жылдам басыңыз. Нәтижеңіз зейін пайызы (%) ретінде есептеледі.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400">Соңғы тест нәтижесі:</span>
+                    <span id="last-test-score" class="text-lg font-bold text-bio-cyan">--%</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                <!-- Reaction Test Canvas/Box -->
+                <div class="lg:col-span-2">
+                    <div id="test-box" onclick="handleTestClick()" class="w-full h-64 sm:h-80 rounded-2xl bg-night-800 border-2 border-dashed border-gray-700 flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-200 relative p-4 text-center">
+                        <div id="test-icon-container" class="w-16 h-16 rounded-full bg-gray-700/50 flex items-center justify-center text-3xl mb-4 text-gray-300">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                        <h3 id="test-main-text" class="text-xl sm:text-2xl font-bold text-gray-200">Бастау үшін мында басыңыз</h3>
+                        <p id="test-sub-text" class="text-sm text-gray-400 mt-2">Экран ЖАСЫЛ болғанда басуға дайын болыңыз</p>
+                    </div>
+                </div>
+
+                <!-- Test Stats & Auto Sync -->
+                <div class="glass-card p-5 rounded-xl border border-gray-800 space-y-4">
+                    <h3 class="font-semibold text-white border-b border-gray-800 pb-2">Тест Параметрлері</h3>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Реакция уақыты:</span>
+                            <span id="reaction-time-ms" class="font-mono text-bio-cyan font-bold">0 ms</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Зейін Пайызы:</span>
+                            <span id="reaction-score-pct" class="font-mono text-bio-purple font-bold">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Талпыныс дәрежесі:</span>
+                            <span id="test-grade" class="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-300">Дайын емес</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-night-900/80 rounded-lg border border-gray-800 text-xs text-gray-400 space-y-1">
+                        <p class="font-medium text-gray-300"><i class="fa-solid fa-circle-check text-bio-emerald"></i> Есептеу формуласы:</p>
+                        <p>200ms = 100% (Жоғары), 500ms+ = 50% немесе төмен.</p>
+                    </div>
+
+                    <button onclick="applyScoreToForm()" id="apply-score-btn" disabled class="w-full py-2.5 bg-bio-purple/20 border border-bio-purple/50 text-bio-purple font-medium text-sm rounded-lg hover:bg-bio-purple hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-import"></i>
+                        <span>Нәтижені күнделікке енгізу</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sleep Log & Entry Form Section -->
+        <section id="log-section" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Form to Add Entry -->
+            <div class="lg:col-span-1 glass-panel p-6 rounded-2xl border border-gray-800 space-y-5">
+                <div class="border-b border-gray-800 pb-3">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-bio-cyan"></i> Ұйқы Күнделігін Толтыру
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">Түнгі ұйқы мен зейін көрсеткішін енгізіңіз</p>
+                </div>
+
+                <form id="sleep-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Күн / Аттамасы</label>
+                        <input type="text" id="input-day" required placeholder="Мысалы: 5-күн немесе 12 Қазан" class="w-full bg-night-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-bio-cyan">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Көз ілген уақыт</label>
+                            <input type="time" id="input-bedtime" required value="23:00" class="w-full bg-night-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-bio-cyan">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Оянған уақыт</label>
+                            <input type="time" id="input-waketime" required value="07:00" class="w-full bg-night-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-bio-cyan">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-medium text-gray-300">Ұйқы сапасы (1-10)</label>
+                            <span id="quality-val" class="text-sm font-bold text-bio-cyan">8</span>
+                        </div>
+                        <input type="range" id="input-quality" min="1" max="10" value="8" oninput="document.getElementById('quality-val').innerText = this.value" class="w-full accent-bio-cyan bg-gray-700 rounded-lg h-2 cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-medium text-gray-300">Зейін Тесті Көрсеткіші (%)</label>
+                            <span class="text-xs text-bio-purple">Тесттен кейін толығады</span>
+                        </div>
+                        <input type="number" id="input-score" min="0" max="100" required placeholder="85" class="w-full bg-night-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-bio-purple font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Қосымша белгілер (Кофе, күйзеліс т.б.)</label>
+                        <input type="text" id="input-notes" placeholder="Кешкі кофе, тыныш ұйқы..." class="w-full bg-night-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-bio-cyan">
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-bio-cyan to-bio-purple text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus font-bold"></i>
+                        <span>Деректі Қосу</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Table of Logged Entries -->
+            <div class="lg:col-span-2 glass-panel p-6 rounded-2xl border border-gray-800 space-y-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-bio-purple"></i> Жинақталған Деректер
+                        </h2>
+                        <span class="text-xs text-gray-400">Ұйқы & Зейін журналы</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-300">
+                            <thead class="bg-night-800 text-xs uppercase text-gray-400 border-b border-gray-700">
+                                <tr>
+                                    <th class="py-3 px-3">Күн</th>
+                                    <th class="py-3 px-3">Уақыт аралығы</th>
+                                    <th class="py-3 px-3">Ұзақтығы</th>
+                                    <th class="py-3 px-3">Сапасы</th>
+                                    <th class="py-3 px-3">Зейін %</th>
+                                    <th class="py-3 px-3">Ескертпе</th>
+                                    <th class="py-3 px-3 text-center">Жою</th>
+                                </tr>
+                            </thead>
+                            <tbody id="log-table-body" class="divide-y divide-gray-800">
+                                <!-- Dynamic Rows inserting here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-800 flex justify-between items-center text-xs text-gray-400">
+                    <span>Барлығы: <strong id="total-logs-count" class="text-white">0</strong> жазба</span>
+                    <button onclick="resetDefaultLogs()" class="text-bio-cyan hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-rotate-left"></i> Бастапқы күйге қайтару
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Visualizations (Chart.js) -->
+        <section id="analytics-section" class="glass-panel p-6 sm:p-8 rounded-2xl border border-gray-800 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-bio-cyan"></i> Деректер Аналитикасы & Графиктер
+                    </h2>
+                    <p class="text-sm text-gray-400 mt-1">Ұйқы ұзақтығы (сағат) мен зейін пайызы (%) арасындағы корреляция</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-bio-cyan inline-block"></span>
+                    <span class="text-xs text-gray-300 mr-3">Ұйқы ұзақтығы (сағ)</span>
+                    <span class="w-3 h-3 rounded-full bg-bio-purple inline-block"></span>
+                    <span class="text-xs text-gray-300">Зейін көрсеткіші (%)</span>
+                </div>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="w-full h-80 sm:h-96 relative">
+                <canvas id="correlationChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Biological Explanation Accordion / Cards -->
+        <section id="bio-section" class="space-y-6">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-3xl font-extrabold text-white">Биологиялық Түсіндірме</h2>
+                <p class="text-sm text-gray-400">Ұйқы кезінде адам ағзасы мен миында орын алатын басты биохимиялық және физиологиялық процестер</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Bio Card 1 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 space-y-3 hover:border-bio-cyan/50 transition duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-bio-cyan/10 text-bio-cyan flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-shower"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">1. Глимфатикалық жүйе</h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        Ояу кезінде ми жасушаларында (нейрондарда) метаболизм өнімдері жиналады. Терең ұйқы фазасында глимфатикалық жүйе белсендіріліп, ми аралық сұйықтық айналымы күшейеді де, <strong>бета-амилоид</strong> сияқты зиянды уытты заттар шайылып шығарылады.
+                    </p>
+                    <div class="pt-2 text-xs text-bio-cyan font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-circle-dot"></i> Уытты заттардан тазару процесі
+                    </div>
+                </div>
+
+                <!-- Bio Card 2 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 space-y-3 hover:border-bio-purple/50 transition duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-bio-purple/10 text-bio-purple flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">2. Синапстық Гомеостаз</h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        Күндіз қабылданған ақпарат мидың қыртысындағы нейрондар арасындағы байланыстарды (синапстарды) нығайтады. Ұйқы кезінде маңызды емес ақпарат сүзіліп, синаптикалық салмақ азаяды және ұзақ мерзімді жадқа жаңа орын босайды.
+                    </p>
+                    <div class="pt-2 text-xs text-bio-purple font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-circle-dot"></i> Жадты консолидациялау
+                    </div>
+                </div>
+
+                <!-- Bio Card 3 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 space-y-3 hover:border-bio-pink/50 transition duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-bio-pink/10 text-bio-pink flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">3. Гормоналды Реттеу</h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        Қараңғы түскенде эпифиз безі <strong>мелатонин</strong> гормонын бөліп, циркадтық ырғақты реттейді. Ұйқы бұзылғанда стресс гормоны <strong>кортизол</strong> мөлшері артып, бұл мидың зейін қоюға жауапты префронтальды бөлігінің жұмысын тежейді.
+                    </p>
+                    <div class="pt-2 text-xs text-bio-pink font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-circle-dot"></i> Мелатонин & Кортизол балансы
+                    </div>
+                </div>
+
+                <!-- Bio Card 4 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 space-y-3 hover:border-bio-emerald/50 transition duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-bio-emerald/10 text-bio-emerald flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-arrows-spin"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">4. Ұйқы Фазалары (REM & NREM)</h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        Түнде ағза 90 минуттық циклдардан өтеді: NREM (Баяу ұйқы – дене тіндерінің қалпына келуі) және REM (Жылдам ұйқы – эмоцияларды өңдеу, шығармашылық ойлау және түс көру). Екі фаза да толық зейін мен зеректік үшін қажет.
+                    </p>
+                    <div class="pt-2 text-xs text-bio-emerald font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-circle-dot"></i> 90 минуттық биоритмдер
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-night-900 py-6 text-center text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>© SLEEP BIO – Ұйқының адам ағзасына әсерін зерттеу жобасы.</p>
+            <div class="flex gap-4">
+                <span class="hover:text-gray-400">Биология & Нейроғылым</span>
+                <span>•</span>
+                <span class="hover:text-gray-400">Когнитивті Тест</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-bio-purple text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium">Хабарлама</span>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Default Initial Log Data
+        const defaultLogs = [
+            { id: 1, day: "1-күн", bedtime: "23:30", waketime: "07:00", duration: 7.5, quality: 8, score: 92, notes: "Кешкілік серуен" },
+            { id: 2, day: "2-күн", bedtime: "02:00", waketime: "06:30", duration: 4.5, quality: 4, score: 60, notes: "Түнде жұмыс істеді" },
+            { id: 3, day: "3-күн", bedtime: "23:00", waketime: "07:30", duration: 8.5, quality: 9, score: 95, notes: "Толық тынығу" },
+            { id: 4, day: "4-күн", bedtime: "01:00", waketime: "07:00", duration: 6.0, quality: 6, score: 74, notes: "Телефонды кеш қарау" }
+        ];
+
+        let logs = JSON.parse(localStorage.getItem('sleep_bio_logs')) || [...defaultLogs];
+        let correlationChart = null;
+
+        // Reaction Test State Variables
+        let testState = 'idle'; // 'idle', 'waiting', 'ready', 'finished'
+        let timerTimeout = null;
+        let startTime = 0;
+        let lastScorePct = null;
+
+        // On Page Load
+        window.onload = function() {
+            renderTable();
+            updateKPIs();
+            initChart();
+        };
+
+        // Scroll helper
+        function scrollToTest() {
+            document.getElementById('test-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Calculate hours between bedtime and waketime
+        function calculateDuration(bedtime, waketime) {
+            const [bHours, bMins] = bedtime.split(':').map(Number);
+            const [wHours, wMins] = waketime.split(':').map(Number);
+
+            let bedDate = new Date(2000, 0, 1, bHours, bMins);
+            let wakeDate = new Date(2000, 0, 1, wHours, wMins);
+
+            if (wakeDate <= bedDate) {
+                wakeDate.setDate(wakeDate.getDate() + 1);
+            }
+
+            const diffMs = wakeDate - bedDate;
+            return parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1));
+        }
+
+        // Render Table Rows
+        function renderTable() {
+            const tbody = document.getElementById('log-table-body');
+            tbody.innerHTML = '';
+
+            logs.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-night-800/50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-semibold text-white">${escapeHtml(item.day)}</td>
+                    <td class="py-3 px-3 text-xs text-gray-400">${item.bedtime} - ${item.waketime}</td>
+                    <td class="py-3 px-3 font-mono font-medium text-bio-cyan">${item.duration} сағат</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold ${item.quality >= 7 ? 'bg-emerald-500/10 text-emerald-400' : item.quality >= 5 ? 'bg-yellow-500/10 text-yellow-400' : 'bg-red-500/10 text-red-400'}">
+                            ${item.quality}/10
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 font-mono font-bold text-bio-purple">${item.score}%</td>
+                    <td class="py-3 px-3 text-xs text-gray-400">${escapeHtml(item.notes || '-')}</td>
+                    <td class="py-3 px-3 text-center">
+                        <button onclick="deleteLog(${item.id})" class="text-gray-500 hover:text-red-400 transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('total-logs-count').innerText = logs.length;
+        }
+
+        // HTML Escape helper
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Update Summary KPI Cards
+        function updateKPIs() {
+            if (logs.length === 0) {
+                document.getElementById('kpi-avg-sleep').innerText = "0 сағ";
+                document.getElementById('kpi-avg-attention').innerText = "0%";
+                document.getElementById('kpi-avg-quality').innerText = "0 / 10";
+                document.getElementById('kpi-days-count').innerText = "0";
+                document.getElementById('kpi-status-text').innerText = "Дерек жоқ";
+                return;
+            }
+
+            const totalSleep = logs.reduce((acc, curr) => acc + curr.duration, 0);
+            const totalScore = logs.reduce((acc, curr) => acc + curr.score, 0);
+            const totalQuality = logs.reduce((acc, curr) => acc + curr.quality, 0);
+
+            const avgSleep = (totalSleep / logs.length).toFixed(1);
+            const avgScore = Math.round(totalScore / logs.length);
+            const avgQuality = (totalQuality / logs.length).toFixed(1);
+
+            document.getElementById('kpi-avg-sleep').innerText = `${avgSleep} сағ`;
+            document.getElementById('kpi-avg-attention').innerText = `${avgScore}%`;
+            document.getElementById('kpi-avg-quality').innerText = `${avgQuality}`;
+            document.getElementById('kpi-days-count').innerText = logs.length;
+
+            const statusEl = document.getElementById('kpi-status-text');
+            if (avgSleep >= 7 && avgScore >= 80) {
+                statusEl.innerText = "Оптималды";
+                statusEl.className = "text-lg font-bold text-bio-emerald mt-1";
+            } else if (avgSleep >= 5.5) {
+                statusEl.innerText = "Орташа (Дефицит)";
+                statusEl.className = "text-lg font-bold text-yellow-400 mt-1";
+            } else {
+                statusEl.innerText = "Төмен (Ұйқысыздық)";
+                statusEl.className = "text-lg font-bold text-red-400 mt-1";
+            }
+        }
+
+        // Add Log Form Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const day = document.getElementById('input-day').value.trim();
+            const bedtime = document.getElementById('input-bedtime').value;
+            const waketime = document.getElementById('input-waketime').value;
+            const quality = parseInt(document.getElementById('input-quality').value);
+            const score = parseInt(document.getElementById('input-score').value);
+            const notes = document.getElementById('input-notes').value.trim();
+
+            const duration = calculateDuration(bedtime, waketime);
+
+            const newLog = {
+                id: Date.now(),
+                day,
+                bedtime,
+                waketime,
+                duration,
+                quality,
+                score,
+                notes
+            };
+
+            logs.push(newLog);
+            saveAndUpdate();
+
+            // Reset form
+            document.getElementById('sleep-form').reset();
+            document.getElementById('quality-val').innerText = '8';
+
+            showToast("Жаңа дерек сәтті енгізілді!");
+        }
+
+        // Delete Log Entry
+        function deleteLog(id) {
+            logs = logs.filter(item => item.id !== id);
+            saveAndUpdate();
+            showToast("Жазба жойылды");
+        }
+
+        // Reset to Default Logs
+        function resetDefaultLogs() {
+            logs = [...defaultLogs];
+            saveAndUpdate();
+            showToast("Бастапқы деректер қайтарылды");
+        }
+
+        // Save to LocalStorage & Refresh UI
+        function saveAndUpdate() {
+            localStorage.setItem('sleep_bio_logs', JSON.stringify(logs));
+            renderTable();
+            updateKPIs();
+            updateChart();
+        }
+
+        // Chart.js Initialization
+        function initChart() {
+            const ctx = document.getElementById('correlationChart').getContext('2d');
+            
+            const labels = logs.map(l => l.day);
+            const sleepData = logs.map(l => l.duration);
+            const scoreData = logs.map(l => l.score);
+
+            correlationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Ұйқы ұзақтығы (сағат)',
+                            data: sleepData,
+                            borderColor: '#06B6D4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            borderWidth: 3,
+                            yAxisID: 'ySleep',
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'Зейін көрсеткіші (%)',
+                            data: scoreData,
+                            borderColor: '#8B5CF6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            borderWidth: 3,
+                            yAxisID: 'yScore',
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#9CA3AF',
+                                font: { family: 'Inter', size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleColor: '#FFF',
+                            bodyColor: '#D1D5DB',
+                            borderColor: '#374151',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9CA3AF' }
+                        },
+                        ySleep: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Ұйқы (Сағат)',
+                                color: '#06B6D4'
+                            },
+                            min: 0,
+                            max: 12,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#06B6D4' }
+                        },
+                        yScore: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Зейін (%)',
+                                color: '#8B5CF6'
+                            },
+                            min: 0,
+                            max: 100,
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#8B5CF6' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update Chart Data
+        function updateChart() {
+            if (!correlationChart) return;
+            correlationChart.data.labels = logs.map(l => l.day);
+            correlationChart.data.datasets[0].data = logs.map(l => l.duration);
+            correlationChart.data.datasets[1].data = logs.map(l => l.score);
+            correlationChart.update();
+        }
+
+        // Interactive Reaction/Attention Test Logic
+        function handleTestClick() {
+            const box = document.getElementById('test-box');
+            const mainText = document.getElementById('test-main-text');
+            const subText = document.getElementById('test-sub-text');
+            const iconContainer = document.getElementById('test-icon-container');
+
+            if (testState === 'idle' || testState === 'finished') {
+                // Start waiting period
+                testState = 'waiting';
+                box.className = "w-full h-64 sm:h-80 rounded-2xl bg-red-950/40 border-2 border-red-500/50 flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-200 relative p-4 text-center";
+                iconContainer.className = "w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center text-3xl mb-4 text-red-400";
+                iconContainer.innerHTML = '<i class="fa-solid fa-hourglass-start"></i>';
+                mainText.innerText = "КҮТІҢІЗ...";
+                subText.innerText = "Экран жасыл болғанда дереу басыңыз!";
+
+                const randomDelay = Math.floor(Math.random() * 3000) + 2000; // 2-5 seconds random
+                timerTimeout = setTimeout(() => {
+                    testState = 'ready';
+                    startTime = Date.now();
+                    box.className = "w-full h-64 sm:h-80 rounded-2xl bg-emerald-600 border-2 border-emerald-400 flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-200 relative p-4 text-center animate-pulse";
+                    iconContainer.className = "w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl mb-4 text-white";
+                    iconContainer.innerHTML = '<i class="fa-solid fa-bolt"></i>';
+                    mainText.innerText = "ҚАЗІР БАСЫҢЫЗ!";
+                    subText.innerText = "Жылдам!";
+                }, randomDelay);
+
+            } else if (testState === 'waiting') {
+                // Clicked too early!
+                clearTimeout(timerTimeout);
+                testState = 'idle';
+                box.className = "w-full h-64 sm:h-80 rounded-2xl bg-yellow-950/40 border-2 border-yellow-500/50 flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-200 relative p-4 text-center";
+                iconContainer.className = "w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center text-3xl mb-4 text-yellow-400";
+                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                mainText.innerText = "Тым ерте бастыңыз!";
+                subText.innerText = "Қайтадан бастау үшін осы жерді басыңыз.";
+
+            } else if (testState === 'ready') {
+                // Success click!
+                const reactionMs = Date.now() - startTime;
+                testState = 'finished';
+
+                // Score Calculation: 200ms -> 100%, 500ms -> 50%, >700ms -> 20%
+                let scorePct = Math.round(100 - ((reactionMs - 200) / 6));
+                if (scorePct > 100) scorePct = 100;
+                if (scorePct < 10) scorePct = 10;
+
+                lastScorePct = scorePct;
+
+                box.className = "w-full h-64 sm:h-80 rounded-2xl bg-night-800 border-2 border-bio-purple/50 flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-200 relative p-4 text-center";
+                iconContainer.className = "w-16 h-16 rounded-full bg-bio-purple/20 flex items-center justify-center text-3xl mb-4 text-bio-purple";
+                iconContainer.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+                mainText.innerText = `${reactionMs} ms`;
+                subText.innerText = `Зейін көрсеткіші: ${scorePct}%. Қайтадан тапсыру үшін басыңыз.`;
+
+                // Update Stats Side panel
+                document.getElementById('reaction-time-ms').innerText = `${reactionMs} ms`;
+                document.getElementById('reaction-score-pct').innerText = `${scorePct}%`;
+                document.getElementById('last-test-score').innerText = `${scorePct}%`;
+
+                const gradeEl = document.getElementById('test-grade');
+                if (reactionMs < 260) {
+                    gradeEl.innerText = "Жоғары зейін";
+                    gradeEl.className = "text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold";
+                } else if (reactionMs < 400) {
+                    gradeEl.innerText = "Орташа";
+                    gradeEl.className = "text-xs px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-bold";
+                } else {
+                    gradeEl.innerText = "Төмен / Енжар";
+                    gradeEl.className = "text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-bold";
+                }
+
+                document.getElementById('apply-score-btn').disabled = false;
+            }
+        }
+
+        // Apply Test Score to Form Input
+        function applyScoreToForm() {
+            if (lastScorePct !== null) {
+                document.getElementById('input-score').value = lastScorePct;
+                showToast(`Зейін балы (${lastScorePct}%) формаға қосылды!`);
+                document.getElementById('log-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Toast Notification Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
